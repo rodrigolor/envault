@@ -84,6 +84,12 @@ class TestSharingManager:
             mgr.load_share(str(tmp_path / "nonexistent.json"))
 
     def test_apply_share_unsupported_version_raises(self, mgr):
-        bundle = {"version": 99, "salt": "abc", "data": "xyz"}
-        with pytest.raises(SharingError, match="Unsupported"):
-            mgr.apply_share(bundle, "pass")
+        bundle = mgr.create_share(["DB_HOST"], "pass")
+        bundle["version"] = 99
+        target_mgr = SharingManager(FakeVault())
+        with pytest.raises(SharingError, match="Unsupported bundle version"):
+            target_mgr.apply_share(bundle, "pass")
+
+    def test_create_share_empty_keys_raises(self, mgr):
+        with pytest.raises(SharingError, match="No keys specified"):
+            mgr.create_share([], "pass")
