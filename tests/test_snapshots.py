@@ -79,3 +79,12 @@ class TestSnapshotManager:
         mgr2 = SnapshotManager(vault, tmp_path)
         assert len(mgr2.list_snapshots()) == 1
         assert mgr2.get("v1") == {"DB_URL": "postgres://localhost", "SECRET": "abc123"}
+
+    def test_list_snapshots_multiple_ordered(self, mgr: SnapshotManager) -> None:
+        """Snapshots should be listed in creation order."""
+        mgr.create("v1")
+        mgr.create("v2")
+        mgr.create("v3")
+        snapshots = mgr.list_snapshots()
+        assert len(snapshots) == 3
+        assert [s["name"] for s in snapshots] == ["v1", "v2", "v3"]
