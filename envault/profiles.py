@@ -56,6 +56,27 @@ class ProfileManager:
         self._profiles.remove(name)
         self._save()
 
+    def rename_profile(self, old_name: str, new_name: str) -> None:
+        """Rename an existing profile.
+
+        Renames the profile in the index and moves its vault file if one exists.
+        Raises ValueError if ``old_name`` does not exist, ``new_name`` is already
+        taken, or an attempt is made to rename the default profile.
+        """
+        if old_name == DEFAULT_PROFILE:
+            raise ValueError("Cannot rename the default profile.")
+        if old_name not in self._profiles:
+            raise KeyError(f"Profile '{old_name}' not found.")
+        if new_name in self._profiles:
+            raise ValueError(f"Profile '{new_name}' already exists.")
+
+        self._profiles[self._profiles.index(old_name)] = new_name
+        self._save()
+
+        old_vault = self.vault_path(old_name)
+        if old_vault.exists():
+            old_vault.rename(self.vault_path(new_name))
+
     def exists(self, name: str) -> bool:
         return name in self._profiles
 
