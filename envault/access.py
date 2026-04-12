@@ -24,7 +24,13 @@ class AccessManager:
 
     def _load(self) -> Dict[str, List[str]]:
         if self._path.exists():
-            return json.loads(self._path.read_text())
+            try:
+                data = json.loads(self._path.read_text())
+            except json.JSONDecodeError as exc:
+                raise AccessError(f"Malformed access file {self._path}: {exc}") from exc
+            if not isinstance(data, dict):
+                raise AccessError(f"Access file {self._path} must contain a JSON object")
+            return data
         return {}
 
     def _save(self) -> None:
