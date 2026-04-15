@@ -64,6 +64,17 @@ class TestPlaceholderCLI:
         assert "BASE_URL=https://example.com" in result.output
         assert "PLAIN=hello" in result.output
 
+    def test_resolve_all_resolves_placeholders(self, runner, mock_vault):
+        """Ensure resolve-all expands placeholder references, not raw values."""
+        result = runner.invoke(
+            placeholder_group, ["resolve-all"],
+            obj={"vault": mock_vault},
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0
+        assert "API_URL=https://example.com/api" in result.output
+        assert "${BASE_URL}" not in result.output
+
     def test_list_refs_shows_references(self, runner, mock_vault):
         result = runner.invoke(
             placeholder_group, ["list-refs", "API_URL"],
