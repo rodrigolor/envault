@@ -49,6 +49,21 @@ class NotificationManager:
             raise NotificationError(f"Unknown event type: {event_type!r}")
         self._handlers[event_type].append(handler)
 
+    def unregister_handler(self, event_type: str, handler: Callable[[NotificationEvent], None]) -> None:
+        """Remove a previously registered handler for the given event type.
+
+        Raises NotificationError if the event type is unknown or the handler
+        was not registered.
+        """
+        if event_type not in self.SUPPORTED_EVENTS:
+            raise NotificationError(f"Unknown event type: {event_type!r}")
+        try:
+            self._handlers[event_type].remove(handler)
+        except ValueError:
+            raise NotificationError(
+                f"Handler {handler!r} is not registered for event type {event_type!r}"
+            )
+
     def configure_webhook(self, event_type: str, url: str) -> None:
         if event_type not in self.SUPPORTED_EVENTS:
             raise NotificationError(f"Unknown event type: {event_type!r}")
