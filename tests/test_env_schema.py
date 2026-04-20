@@ -76,9 +76,9 @@ class TestEnvSchema:
         assert any("ENABLED" in e for e in errors)
 
     def test_extra_keys_in_env_are_ignored(self, mgr: EnvSchema) -> None:
-        """Keys present in env but not in schema should not produce errors."""
+        """Keys present in env but not in schema should not cause errors."""
         mgr.define("PORT", type="integer")
-        errors = mgr.validate({"PORT": "8080", "UNTRACKED_VAR": "some_value"})
+        errors = mgr.validate({"PORT": "8080", "UNTRACKED_VAR": "whatever"})
         assert errors == []
 
     def test_define_duplicate_key_overwrites(self, mgr: EnvSchema) -> None:
