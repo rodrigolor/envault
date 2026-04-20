@@ -66,3 +66,11 @@ class TestAccessManager:
         mgr.set_permissions("LOCKED", [])
         assert mgr.can_read("LOCKED") is False
         assert mgr.can_write("LOCKED") is False
+
+    def test_get_permissions_no_matching_rule_returns_default(self, mgr):
+        """When no rule matches a key, get_permissions should return the default
+        full-access permissions rather than None or raising an error."""
+        mgr.set_permissions("DB_*", ["read"])
+        # "UNRELATED_KEY" does not match "DB_*", so default applies
+        result = mgr.get_permissions("UNRELATED_KEY")
+        assert result == ["read", "write"]
