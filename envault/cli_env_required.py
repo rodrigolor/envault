@@ -61,9 +61,17 @@ def list_required(ctx: click.Context) -> None:
 
 
 @required_group.command("check")
+@click.option(
+    "--quiet", "-q", is_flag=True, default=False,
+    help="Suppress output on success; exit code only."
+)
 @click.pass_context
-def check_required(ctx: click.Context) -> None:
-    """Check that all required keys are present in the vault."""
+def check_required(ctx: click.Context, quiet: bool) -> None:
+    """Check that all required keys are present in the vault.
+
+    Exits with a non-zero status code if any required keys are missing.
+    Use --quiet to suppress the success message (useful in scripts).
+    """
     from envault.cli import get_vault  # local import to avoid circular deps
 
     mgr = _get_manager(ctx)
@@ -75,4 +83,5 @@ def check_required(ctx: click.Context) -> None:
             click.echo(f"  - {k}", err=True)
         ctx.exit(1)
     else:
-        click.echo("All required keys are present.")
+        if not quiet:
+            click.echo("All required keys are present.")
